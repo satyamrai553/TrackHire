@@ -6,7 +6,7 @@ import {
   getJobApplicationById,
   updateJobApplication,
   deleteJobApplication,
-} from "../controller/job.controller.js";
+} from "../controllers/job.controller.js";
 
 const router = Router();
 

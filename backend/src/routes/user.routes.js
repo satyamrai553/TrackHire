@@ -11,7 +11,7 @@ import {
   updateAccountDetails,
   updateUserAvatar,
   changeCurrentPassword,
-} from "../controller/user.controller.js";
+} from "../controllers/user.controller.js";
 
 const router = Router();
 

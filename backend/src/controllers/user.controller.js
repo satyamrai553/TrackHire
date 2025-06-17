@@ -1,8 +1,8 @@
-import { User } from '../models/user.model.js';
-import { Cart } from '../models/cart.model.js';
+import { User } from '../models/user.models.js';
+
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ErrorResponse } from '../utils/errorResponse.js';
-import { ApiResponse } from "../utils/apiResponse.js";
+import { apiResponse } from "../utils/apiResponse.js";
 import jwt from 'jsonwebtoken';
 import { uploadOnCloudinary } from "../utils/uploadOnCloudinary.js";
 import fs from 'fs';
@@ -67,7 +67,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(200, createdUser, "User registered successfully"));
+        .json(new apiResponse(200, createdUser, "User registered successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -110,7 +110,7 @@ const loginUser = asyncHandler(async (req, res) => {
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
-            new ApiResponse(200, { 
+            new apiResponse(200, { 
                 user: loggedInUser, 
                 accessToken, 
                 refreshToken 
@@ -142,13 +142,13 @@ const logoutUser = asyncHandler(async (req, res) => {
         .status(200)
         .clearCookie("accessToken", options)
         .clearCookie("refreshToken", options)
-        .json(new ApiResponse(200, {}, "User logged out successfully"));
+        .json(new apiResponse(200, {}, "User logged out successfully"));
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
-        .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
+        .json(new apiResponse(200, req.user, "Current user fetched successfully"));
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -184,7 +184,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             .cookie('accessToken', accessToken, options)
             .cookie("refreshToken", newRefreshToken, options)
             .json(
-                new ApiResponse(
+                new apiResponse(
                     200,
                     { accessToken, refreshToken: newRefreshToken },
                     "Access token refreshed successfully"
@@ -210,7 +210,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Password changed successfully"));
+        .json(new apiResponse(200, {}, "Password changed successfully"));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -233,7 +233,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, user, "Account details updated successfully"));
+        .json(new apiResponse(200, user, "Account details updated successfully"));
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
@@ -262,7 +262,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, user, "Avatar updated successfully"));
+        .json(new apiResponse(200, user, "Avatar updated successfully"));
 });
 
 export {

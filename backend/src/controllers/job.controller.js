@@ -1,7 +1,7 @@
-import { JobApplication } from '../models/jobApplication.model.js';
+import { JobApplication } from '../models/jobApplication.models.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ErrorResponse } from '../utils/errorResponse.js';
-import { ApiResponse } from '../utils/apiResponse.js';
+import { apiResponse } from '../utils/apiResponse.js';
 
 const createJobApplication = asyncHandler(async (req, res) => {
     const {
@@ -34,7 +34,7 @@ const createJobApplication = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201, jobApplication, "Job application created successfully"));
+        .json(new apiResponse(201, jobApplication, "Job application created successfully"));
 });
 
 const getAllJobApplications = asyncHandler(async (req, res) => {
@@ -59,7 +59,7 @@ const getAllJobApplications = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, jobApplications, "Job applications retrieved successfully"));
+        .json(new apiResponse(200, jobApplications, "Job applications retrieved successfully"));
 });
 
 const getJobApplicationById = asyncHandler(async (req, res) => {
@@ -76,7 +76,7 @@ const getJobApplicationById = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, jobApplication, "Job application retrieved successfully"));
+        .json(new apiResponse(200, jobApplication, "Job application retrieved successfully"));
 });
 
 const updateJobApplication = asyncHandler(async (req, res) => {
@@ -100,7 +100,7 @@ const updateJobApplication = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, jobApplication, "Job application updated successfully"));
+        .json(new apiResponse(200, jobApplication, "Job application updated successfully"));
 });
 
 const deleteJobApplication = asyncHandler(async (req, res) => {
@@ -117,7 +117,7 @@ const deleteJobApplication = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, {}, "Job application deleted successfully"));
+        .json(new apiResponse(200, {}, "Job application deleted successfully"));
 });
 
 export {

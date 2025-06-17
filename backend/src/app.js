@@ -37,7 +37,7 @@ app.use(cookieParser())
 
 //import routes
 import healthCheckRouter from "./routes/healthCheck.routes.js"
-import userRouter from "./routes/user.route.js";
+import userRouter from "./routes/user.routes.js";
 import adminRouter from './routes/admin.routes.js';
 import jobRouter from './routes/job.routes.js';
 

@@ -9,12 +9,12 @@ import {
   updateJobStatus,
   deleteJob
 } from '../controllers/admin.controller.js';
-import { authMiddleware, adminMiddleware } from '../middlewares/auth.middleware.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
 // Apply auth and admin middleware to all admin routes
-router.use(authMiddleware, adminMiddleware);
+router.use(verifyJWT);
 
 // User management routes
 router.route('/users')

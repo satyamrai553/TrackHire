@@ -1,12 +1,13 @@
-import { User } from '../models/user.model.js';
-import { JobApplication } from '../models/jobApplication.model.js';
+import { User } from '../models/user.models.js';
+import { JobApplication } from '../models/jobApplication.models.js';
 import { ErrorResponse } from '../utils/errorResponse.js';
-import { ApiResponse } from '../utils/apiResponse.js';
+import { apiResponse } from '../utils/apiResponse.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 
 // User Management
 export const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find({}).select('-password -refreshToken');
-  res.status(200).json(new ApiResponse(200, users, "All users retrieved successfully"));
+  res.status(200).json(new apiResponse(200, users, "All users retrieved successfully"));
 });
 
 export const getUserById = asyncHandler(async (req, res) => {
@@ -14,7 +15,7 @@ export const getUserById = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ErrorResponse(404, "User not found");
   }
-  res.status(200).json(new ApiResponse(200, user, "User retrieved successfully"));
+  res.status(200).json(new apiResponse(200, user, "User retrieved successfully"));
 });
 
 export const updateUserRole = asyncHandler(async (req, res) => {
@@ -34,7 +35,7 @@ export const updateUserRole = asyncHandler(async (req, res) => {
     throw new ErrorResponse(404, "User not found");
   }
 
-  res.status(200).json(new ApiResponse(200, user, "User role updated successfully"));
+  res.status(200).json(new apiResponse(200, user, "User role updated successfully"));
 });
 
 export const deleteUser = asyncHandler(async (req, res) => {
@@ -47,7 +48,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
   // Optionally: Delete all job applications associated with this user
   await JobApplication.deleteMany({ user: req.params.id });
 
-  res.status(200).json(new ApiResponse(200, {}, "User deleted successfully"));
+  res.status(200).json(new apiResponse(200, {}, "User deleted successfully"));
 });
 
 // Job Management
@@ -62,7 +63,7 @@ export const getAllJobs = asyncHandler(async (req, res) => {
     .populate('user', 'fullname email phoneNumber')
     .sort({ appliedDate: -1 });
 
-  res.status(200).json(new ApiResponse(200, jobs, "All job applications retrieved successfully"));
+  res.status(200).json(new apiResponse(200, jobs, "All job applications retrieved successfully"));
 });
 
 export const getJobById = asyncHandler(async (req, res) => {
@@ -73,7 +74,7 @@ export const getJobById = asyncHandler(async (req, res) => {
     throw new ErrorResponse(404, "Job application not found");
   }
 
-  res.status(200).json(new ApiResponse(200, job, "Job application retrieved successfully"));
+  res.status(200).json(new apiResponse(200, job, "Job application retrieved successfully"));
 });
 
 export const updateJobStatus = asyncHandler(async (req, res) => {
@@ -93,7 +94,7 @@ export const updateJobStatus = asyncHandler(async (req, res) => {
     throw new ErrorResponse(404, "Job application not found");
   }
 
-  res.status(200).json(new ApiResponse(200, job, "Job status updated successfully"));
+  res.status(200).json(new apiResponse(200, job, "Job status updated successfully"));
 });
 
 export const deleteJob = asyncHandler(async (req, res) => {
@@ -103,5 +104,5 @@ export const deleteJob = asyncHandler(async (req, res) => {
     throw new ErrorResponse(404, "Job application not found");
   }
 
-  res.status(200).json(new ApiResponse(200, {}, "Job application deleted successfully"));
+  res.status(200).json(new apiResponse(200, {}, "Job application deleted successfully"));
 });

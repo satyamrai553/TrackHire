@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 
 //mongoDB connection logic
-const DB_NAME = 'myDatabase'; // Replace with your actual database name
+const DB_NAME = 'myDatabase'; 
 
 const connectDB = async () => {
   try {
