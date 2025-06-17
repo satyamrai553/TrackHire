@@ -38,11 +38,16 @@ app.use(cookieParser())
 //import routes
 import healthCheckRouter from "./routes/healthCheck.routes.js"
 import userRouter from "./routes/user.route.js";
+import adminRouter from './routes/admin.routes.js';
+import jobRouter from './routes/job.routes.js';
+
 
 
 //routes
 app.use("/api/v1/healthCheck", healthCheckRouter)
 app.use("/api/v1/users", userRouter)
+app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/jobs', jobRouter);
 
 
 export {
