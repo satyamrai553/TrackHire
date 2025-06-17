@@ -1,0 +1,112 @@
+[
+  {
+    "user": { "$oid": "666000000000000000000001" },
+    "company": "OpenAI",
+    "role": "AI Engineer",
+    "status": "Interview",
+    "appliedDate": { "$date": "2025-06-01T10:00:00Z" },
+    "notes": "Completed phone round.",
+    "resumeLink": "https://resume.link/alice",
+    "location": "Remote",
+    "companyWebsite": "https://openai.com"
+  },
+  {
+    "user": { "$oid": "666000000000000000000002" },
+    "company": "Google",
+    "role": "Software Engineer",
+    "status": "Applied",
+    "appliedDate": { "$date": "2025-06-02T10:00:00Z" },
+    "notes": "Waiting for response.",
+    "resumeLink": "https://resume.link/bob",
+    "location": "Bangalore",
+    "companyWebsite": "https://google.com"
+  },
+  {
+    "user": { "$oid": "666000000000000000000003" },
+    "company": "Microsoft",
+    "role": "Cloud Architect",
+    "status": "Rejected",
+    "appliedDate": { "$date": "2025-05-28T10:00:00Z" },
+    "notes": "Rejected after final round.",
+    "resumeLink": "https://resume.link/charlie",
+    "location": "Hyderabad",
+    "companyWebsite": "https://microsoft.com"
+  },
+  {
+    "user": { "$oid": "666000000000000000000004" },
+    "company": "Amazon",
+    "role": "DevOps Engineer",
+    "status": "Offer",
+    "appliedDate": { "$date": "2025-06-03T10:00:00Z" },
+    "notes": "Offer letter received.",
+    "resumeLink": "https://resume.link/admin",
+    "location": "Pune",
+    "companyWebsite": "https://amazon.jobs"
+  },
+  {
+    "user": { "$oid": "666000000000000000000005" },
+    "company": "Infosys",
+    "role": "Frontend Developer",
+    "status": "Accepted",
+    "appliedDate": { "$date": "2025-06-05T10:00:00Z" },
+    "notes": "Accepted offer.",
+    "resumeLink": "https://resume.link/deepa",
+    "location": "Delhi",
+    "companyWebsite": "https://infosys.com"
+  },
+  {
+    "user": { "$oid": "666000000000000000000006" },
+    "company": "TCS",
+    "role": "Backend Developer",
+    "status": "Applied",
+    "appliedDate": { "$date": "2025-06-06T10:00:00Z" },
+    "notes": "",
+    "resumeLink": "https://resume.link/farhan",
+    "location": "Chennai",
+    "companyWebsite": "https://tcs.com"
+  },
+  {
+    "user": { "$oid": "666000000000000000000007" },
+    "company": "Zomato",
+    "role": "Full Stack Engineer",
+    "status": "Interview",
+    "appliedDate": { "$date": "2025-06-07T10:00:00Z" },
+    "notes": "Scheduled tech interview.",
+    "resumeLink": "https://resume.link/geeta",
+    "location": "Gurgaon",
+    "companyWebsite": "https://zomato.com"
+  },
+  {
+    "user": { "$oid": "666000000000000000000008" },
+    "company": "Swiggy",
+    "role": "Mobile App Developer",
+    "status": "Applied",
+    "appliedDate": { "$date": "2025-06-08T10:00:00Z" },
+    "notes": "",
+    "resumeLink": "https://resume.link/harsh",
+    "location": "Mumbai",
+    "companyWebsite": "https://swiggy.com"
+  },
+  {
+    "user": { "$oid": "666000000000000000000009" },
+    "company": "Paytm",
+    "role": "QA Engineer",
+    "status": "Rejected",
+    "appliedDate": { "$date": "2025-06-09T10:00:00Z" },
+    "notes": "Didn't clear HR round.",
+    "resumeLink": "https://resume.link/isha",
+    "location": "Noida",
+    "companyWebsite": "https://paytm.com"
+  },
+  {
+    "user": { "$oid": "666000000000000000000010" },
+    "company": "Byju's",
+    "role": "Data Analyst",
+    "status": "Interview",
+    "appliedDate": { "$date": "2025-06-10T10:00:00Z" },
+    "notes": "Waiting for final interview.",
+    "resumeLink": "https://resume.link/jatin",
+    "location": "Bangalore",
+    "companyWebsite": "https://byjus.com"
+  }
+]
