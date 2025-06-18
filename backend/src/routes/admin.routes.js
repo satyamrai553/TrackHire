@@ -10,11 +10,12 @@ import {
   deleteJob
 } from '../controllers/admin.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
+import { verifyAdmin } from '../middlewares/admin.middleware.js';
 
 const router = express.Router();
 
-// Apply auth and admin middleware to all admin routes
-router.use(verifyJWT);
+// Apply both middlewares to all admin routes
+router.use(verifyJWT, verifyAdmin);
 
 // User management routes
 router.route('/users')
@@ -25,7 +26,7 @@ router.route('/users/:id')
   .patch(updateUserRole)
   .delete(deleteUser);
 
-// Job management routes
+// Job management routes (admin-only versions)
 router.route('/jobs')
   .get(getAllJobs);
 

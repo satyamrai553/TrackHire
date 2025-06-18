@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyAdmin } from "../middlewares/admin.middleware.js";
 import {
   createJobApplication,
   getAllJobApplications,
@@ -10,13 +11,14 @@ import {
 
 const router = Router();
 
-// All routes are protected by JWT
+// Apply JWT verification to all job routes
 router.use(verifyJWT);
 
-router.post("/", createJobApplication);                 // Create a new job
-router.get("/", getAllJobApplications);                 // Get all jobs (with filters & sorting)
-router.get("/:id", getJobApplicationById);              // Get job by ID
-router.put("/:id", updateJobApplication);               // Update job by ID
-router.delete("/:id", deleteJobApplication);            // Delete job by ID
+// Only admins can create, update, or delete jobs
+router.post("/", verifyAdmin, createJobApplication);          
+router.get("/", getAllJobApplications);                       
+router.get("/:id", getJobApplicationById);                    
+router.put("/:id", verifyAdmin, updateJobApplication);        
+router.delete("/:id", verifyAdmin, deleteJobApplication);     
 
 export default router;
