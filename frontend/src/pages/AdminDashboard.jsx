@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import api from '../api';
 import { BarChartComponent as BarChart, PieChartComponent as PieChart } from '../components/Charts';
 
 const AdminDashboard = () => {
@@ -14,14 +15,25 @@ const AdminDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    console.log('AdminDashboard auth:', { isAuthenticated, user });
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else if (!user || user.role !== 'admin') {
+      navigate('/');
+    }
+  }, [isAuthenticated, user, navigate]);
+  
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
         const [jobsRes, usersRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_BASE_URL}/admin/jobs`),
-          axios.get(`${import.meta.env.VITE_BASE_URL}/admin/users`)
+          api.get('/admin/jobs'),
+          api.get('/admin/users')
         ]);
 
         const jobs = jobsRes.data.data;
@@ -42,8 +54,15 @@ const AdminDashboard = () => {
       }
     };
 
-    fetchDashboardData();
-  }, []);
+    // Only fetch if admin
+    if (isAuthenticated && user && user.role === 'admin') {
+      fetchDashboardData();
+    }
+  }, [isAuthenticated, user]);
+
+  if (!isAuthenticated || !user || user.role !== 'admin') {
+    return null; // Show nothing while redirecting
+  }
 
   if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
   if (error) return <div className="text-red-500 text-center p-4">{error}</div>;

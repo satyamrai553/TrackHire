@@ -5,7 +5,7 @@ const initialState = {
   isAuthenticated: false,
   loading: false,
   error: null,
-  token: localStorage.getItem('token') || null,
+  token: localStorage.getItem('accessToken') || null,
 };
 
 const authSlice = createSlice({
@@ -22,7 +22,7 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.error = null;
-      localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('accessToken', action.payload.token);
     },
     loginFailure: (state, action) => {
       state.loading = false;
@@ -30,7 +30,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
     },
     registerStart: (state) => {
       state.loading = true;
@@ -42,7 +42,7 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.error = null;
-      localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('accessToken', action.payload.token);
     },
     registerFailure: (state, action) => {
       state.loading = false;
@@ -54,7 +54,7 @@ const authSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.token = null;
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
     },
     clearError: (state) => {
       state.error = null;

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -10,8 +11,18 @@ import AdminDashboard from './pages/AdminDashboard';
 import Jobs from './pages/Jobs';
 import Companies from './pages/Companies';
 import Resources from './pages/Resources';
+import { verifyToken } from './features/auth/authThunks';
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      dispatch(verifyToken());
+    }
+  }, [dispatch]);
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">

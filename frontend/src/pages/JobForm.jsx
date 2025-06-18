@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { jobAPI } from '../api/jobAPI';
@@ -15,16 +15,18 @@ const JobForm = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  // Only allow admin
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Post a New Job</h1>
-        <p className="text-red-600 font-semibold">Access denied. Only admins can post jobs.</p>
-      </div>
-    );
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else if (!user || user.role !== 'admin') {
+      navigate('/');
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  if (!isAuthenticated || !user || user.role !== 'admin') {
+    return null; // Show nothing while redirecting
   }
 
   const handleSubmit = async (e) => {

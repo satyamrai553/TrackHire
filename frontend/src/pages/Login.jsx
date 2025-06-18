@@ -27,8 +27,10 @@ const Login = () => {
           withCredentials: true
         }
       );
-      // Dispatch login to Redux
-      dispatch(loginSuccess({ user: response.data.user, token: response.data.token }));
+      console.log('Login response:', response.data);
+      const { user, accessToken } = response.data.data;
+      localStorage.setItem('accessToken', accessToken);
+      dispatch(loginSuccess({ user, token: accessToken }));
       navigate('/dashboard');
     } catch (err) {
       if (err.response) {

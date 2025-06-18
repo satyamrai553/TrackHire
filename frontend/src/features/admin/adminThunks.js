@@ -1,36 +1,25 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { adminAPI } from '../../api/adminAPI';
-import {
-  fetchUsersStart,
-  fetchUsersSuccess,
-  fetchUsersFailure,
-  updateUserRoleStart,
-  updateUserRoleSuccess,
-  updateUserRoleFailure,
-  deleteUserStart,
-  deleteUserSuccess,
-  deleteUserFailure,
-  fetchDashboardStatsStart,
-  fetchDashboardStatsSuccess,
-  fetchDashboardStatsFailure,
-  fetchAnalyticsStart,
-  fetchAnalyticsSuccess,
-  fetchAnalyticsFailure,
-} from './adminSlice';
+import { Status } from './adminSlice'; // Import status constants
 
-// Fetch all users
+// Helper function for consistent error handling
+const handleApiError = (error) => {
+  const errorMessage = error.response?.data?.message || error.message || 'Something went wrong';
+  throw new Error(errorMessage);
+};
+
+// Fetch all users with pagination
 export const fetchUsers = createAsyncThunk(
   'admin/fetchUsers',
-  async (params, { dispatch }) => {
+  async (params = { page: 1, limit: 10 }, { rejectWithValue }) => {
     try {
-      dispatch(fetchUsersStart());
       const response = await adminAPI.getUsers(params);
-      dispatch(fetchUsersSuccess(response));
-      return response;
+      return {
+        data: response.data.users,
+        pagination: response.data.pagination
+      };
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch users';
-      dispatch(fetchUsersFailure(errorMessage));
-      throw error;
+      return rejectWithValue(handleApiError(error));
     }
   }
 );
@@ -38,16 +27,16 @@ export const fetchUsers = createAsyncThunk(
 // Update user role
 export const updateUserRole = createAsyncThunk(
   'admin/updateUserRole',
-  async ({ id, role }, { dispatch }) => {
+  async ({ userId, role }, { rejectWithValue }) => {
     try {
-      dispatch(updateUserRoleStart());
-      await adminAPI.updateUserRole(id, role);
-      dispatch(updateUserRoleSuccess({ id, role }));
-      return { id, role };
+      const response = await adminAPI.updateUserRole(userId, role);
+      return {
+        userId,
+        role: response.data.role,
+        updatedUser: response.data.user
+      };
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to update user role';
-      dispatch(updateUserRoleFailure(errorMessage));
-      throw error;
+      return rejectWithValue(handleApiError(error));
     }
   }
 );
@@ -55,78 +44,86 @@ export const updateUserRole = createAsyncThunk(
 // Delete user
 export const deleteUser = createAsyncThunk(
   'admin/deleteUser',
-  async (id, { dispatch }) => {
+  async (userId, { rejectWithValue }) => {
     try {
-      dispatch(deleteUserStart());
-      await adminAPI.deleteUser(id);
-      dispatch(deleteUserSuccess(id));
-      return id;
+      await adminAPI.deleteUser(userId);
+      return userId;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to delete user';
-      dispatch(deleteUserFailure(errorMessage));
-      throw error;
+      return rejectWithValue(handleApiError(error));
     }
   }
 );
 
-// Fetch dashboard stats
+// Fetch dashboard statistics
 export const fetchDashboardStats = createAsyncThunk(
   'admin/fetchDashboardStats',
-  async (_, { dispatch }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      dispatch(fetchDashboardStatsStart());
       const response = await adminAPI.getDashboardStats();
-      dispatch(fetchDashboardStatsSuccess(response));
-      return response;
+      return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch dashboard stats';
-      dispatch(fetchDashboardStatsFailure(errorMessage));
-      throw error;
+      return rejectWithValue(handleApiError(error));
     }
   }
 );
 
-// Fetch analytics
+// Fetch analytics data
 export const fetchAnalytics = createAsyncThunk(
   'admin/fetchAnalytics',
-  async (params, { dispatch }) => {
+  async (params = { timeframe: '30d' }, { rejectWithValue }) => {
     try {
-      dispatch(fetchAnalyticsStart());
       const response = await adminAPI.getAnalytics(params);
-      dispatch(fetchAnalyticsSuccess(response));
-      return response;
+      return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch analytics';
-      dispatch(fetchAnalyticsFailure(errorMessage));
-      throw error;
+      return rejectWithValue(handleApiError(error));
     }
   }
 );
 
-// Update job status (approve/reject)
-export const updateJobStatus = createAsyncThunk(
-  'admin/updateJobStatus',
-  async ({ id, status }) => {
-    try {
-      const response = await adminAPI.updateJobStatus(id, status);
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to update job status';
-      throw new Error(errorMessage);
-    }
-  }
-);
+// Job Management
 
-// Get all jobs for admin
-export const getAllJobs = createAsyncThunk(
-  'admin/getAllJobs',
-  async (params) => {
+// Get all jobs (admin view)
+export const fetchAllJobs = createAsyncThunk(
+  'admin/fetchAllJobs',
+  async (params = { status: 'all', page: 1 }, { rejectWithValue }) => {
     try {
       const response = await adminAPI.getAllJobs(params);
-      return response;
+      return {
+        jobs: response.data.jobs,
+        pagination: response.data.pagination
+      };
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch jobs';
-      throw new Error(errorMessage);
+      return rejectWithValue(handleApiError(error));
     }
   }
-); 
+);
+
+// Update job status
+export const updateJobStatus = createAsyncThunk(
+  'admin/updateJobStatus',
+  async ({ jobId, status }, { rejectWithValue }) => {
+    try {
+      const response = await adminAPI.updateJobStatus(jobId, status);
+      return {
+        jobId,
+        status,
+        updatedJob: response.data.job
+      };
+    } catch (error) {
+      return rejectWithValue(handleApiError(error));
+    }
+  }
+);
+
+// Delete job
+export const deleteJob = createAsyncThunk(
+  'admin/deleteJob',
+  async (jobId, { rejectWithValue }) => {
+    try {
+      await adminAPI.deleteJob(jobId);
+      return jobId;
+    } catch (error) {
+      return rejectWithValue(handleApiError(error));
+    }
+  }
+);
