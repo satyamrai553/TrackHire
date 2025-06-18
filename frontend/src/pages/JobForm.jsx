@@ -1,49 +1,75 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { jobAPI } from '../api/jobAPI';
 
 const JobForm = () => {
   const [formData, setFormData] = useState({
-    title: '',
-    company: '',
+    jobTitle: '',
+    companyName: '',
     location: '',
-    type: 'Full-time',
-    description: '',
-    requirements: ''
+    jobType: 'Full-time',
+    jobDescription: '',
+    applicationLink: ''
   });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
-  const handleSubmit = (e) => {
+  // Only allow admin
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Post a New Job</h1>
+        <p className="text-red-600 font-semibold">Access denied. Only admins can post jobs.</p>
+      </div>
+    );
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add job posting logic here
-    console.log('Job posting attempt:', formData);
+    setError('');
+    setSuccess('');
+    try {
+      await jobAPI.createJob(formData);
+      setSuccess('Job posted successfully!');
+      setTimeout(() => navigate('/jobs'), 1500);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || 'Failed to post job. Please try again.'
+      );
+    }
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Post a New Job</h1>
+      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+      {success && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{success}</div>}
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700">
             Job Title
           </label>
           <input
             type="text"
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({...formData, title: e.target.value})}
+            id="jobTitle"
+            value={formData.jobTitle}
+            onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
             required
           />
         </div>
         <div>
-          <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-            Company
+          <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+            Company Name
           </label>
           <input
             type="text"
-            id="company"
-            value={formData.company}
-            onChange={(e) => setFormData({...formData, company: e.target.value})}
+            id="companyName"
+            value={formData.companyName}
+            onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
             required
           />
@@ -56,19 +82,19 @@ const JobForm = () => {
             type="text"
             id="location"
             value={formData.location}
-            onChange={(e) => setFormData({...formData, location: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
             required
           />
         </div>
         <div>
-          <label htmlFor="type" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="jobType" className="block text-sm font-medium text-gray-700">
             Job Type
           </label>
           <select
-            id="type"
-            value={formData.type}
-            onChange={(e) => setFormData({...formData, type: e.target.value})}
+            id="jobType"
+            value={formData.jobType}
+            onChange={(e) => setFormData({ ...formData, jobType: e.target.value })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
           >
             <option value="Full-time">Full-time</option>
@@ -78,27 +104,27 @@ const JobForm = () => {
           </select>
         </div>
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700">
             Description
           </label>
           <textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) => setFormData({...formData, description: e.target.value})}
+            id="jobDescription"
+            value={formData.jobDescription}
+            onChange={(e) => setFormData({ ...formData, jobDescription: e.target.value })}
             rows="4"
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
             required
           />
         </div>
         <div>
-          <label htmlFor="requirements" className="block text-sm font-medium text-gray-700">
-            Requirements
+          <label htmlFor="applicationLink" className="block text-sm font-medium text-gray-700">
+            Application Link
           </label>
-          <textarea
-            id="requirements"
-            value={formData.requirements}
-            onChange={(e) => setFormData({...formData, requirements: e.target.value})}
-            rows="4"
+          <input
+            type="text"
+            id="applicationLink"
+            value={formData.applicationLink}
+            onChange={(e) => setFormData({ ...formData, applicationLink: e.target.value })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
             required
           />

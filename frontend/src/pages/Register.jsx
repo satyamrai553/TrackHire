@@ -77,7 +77,7 @@ const Register = () => {
         fullname: formData.fullname,
         email: formData.email,
         phoneNumber: formData.phoneNumber,
-        role: 'customer'
+        role: 'user'
       });
 
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, {
@@ -85,7 +85,7 @@ const Register = () => {
         email: formData.email,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
-        role: 'customer'
+        role: 'user'
       }, {
         headers: {
           'Content-Type': 'application/json'

@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { FaUserCircle, FaBriefcase } from 'react-icons/fa';
+import { useSelector, useDispatch } from 'react-redux';
+import { logoutUser } from '../features/auth/authThunks';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,19 +24,29 @@ const Navbar = () => {
     setIsOpen(false);
   }, [location]);
 
+  const handleLogout = () => {
+    dispatch(logoutUser());
+  };
+
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}>
+    <nav
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-white shadow-md py-2'
+          : 'bg-gradient-to-r from-blue-600 to-indigo-600 py-4'
+      }`}
+    >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className={`text-2xl font-bold flex items-center ${scrolled ? 'text-blue-600' : 'text-white'}`}
           >
             <FaBriefcase className="mr-2" />
             <span className={`bg-gradient-to-r ${scrolled ? 'from-blue-600 to-indigo-600' : 'from-white to-blue-100'} bg-clip-text text-transparent`}>
-  TrackHire
-</span>
+              TrackHire
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -55,20 +69,36 @@ const Navbar = () => {
             >
               Resources
             </Link>
-            
             <div className="flex items-center space-x-4 ml-4">
-              <Link 
-                to="/login" 
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${scrolled ? 'text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/10'}`}
-              >
-                Sign In
-              </Link>
-              <Link 
-                to="/register" 
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
-              >
-                Get Started
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard" className={`flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${scrolled ? 'text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/10'}`}>
+                    <FaUserCircle className="mr-2" />
+                    {user?.fullname || user?.email || 'Profile'}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all shadow-md hover:shadow-lg"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${scrolled ? 'text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -106,20 +136,36 @@ const Navbar = () => {
             >
               Resources
             </Link>
-            
             <div className="border-t pt-3 mt-3 px-4 space-y-3">
-              <Link 
-                to="/login" 
-                className={`block text-center px-4 py-2 rounded-lg font-medium ${scrolled ? 'text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/10'}`}
-              >
-                Sign In
-              </Link>
-              <Link 
-                to="/register" 
-                className="block text-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all"
-              >
-                Get Started
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard" className={`block text-center px-4 py-2 rounded-lg font-medium ${scrolled ? 'text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/10'}`}>
+                    <FaUserCircle className="mr-2 inline" />
+                    {user?.fullname || user?.email || 'Profile'}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-center px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className={`block text-center px-4 py-2 rounded-lg font-medium ${scrolled ? 'text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/10'}`}
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="block text-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

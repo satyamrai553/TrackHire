@@ -7,6 +7,9 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import JobForm from './pages/JobForm';
 import AdminDashboard from './pages/AdminDashboard';
+import Jobs from './pages/Jobs';
+import Companies from './pages/Companies';
+import Resources from './pages/Resources';
 
 const App = () => {
   return (
@@ -20,6 +23,9 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/post-job" element={<JobForm />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/companies" element={<Companies />} />
+          <Route path="/resources" element={<Resources />} />
         </Routes>
       </div>
     </Router>
