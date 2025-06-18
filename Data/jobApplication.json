@@ -1,112 +1,127 @@
 [
   {
-    "user": { "$oid": "666000000000000000000001" },
-    "company": "OpenAI",
-    "role": "AI Engineer",
+    "_id": {
+      "$oid": "5f8d8a7b2f4d4b1d2c3e4f5b"
+    },
+    "user": {
+      "$oid": "685281c4df034aeaa9077734"
+    },
+    "company": "TechCorp Inc.",
+    "role": "Senior Software Engineer",
     "status": "Interview",
-    "appliedDate": { "$date": "2025-06-01T10:00:00Z" },
-    "notes": "Completed phone round.",
-    "resumeLink": "https://resume.link/alice",
-    "location": "Remote",
-    "companyWebsite": "https://openai.com"
+    "appliedDate": {
+      "$date": "2025-06-10T09:00:00Z"
+    },
+    "notes": "Technical interview scheduled for June 25th",
+    "resumeLink": "https://storage.example.com/resumes/techcorp_app.pdf",
+    "location": "San Francisco, CA (Hybrid)",
+    "companyWebsite": "https://techcorp.example.com/careers",
+    "createdAt": {
+      "$date": "2025-06-10T10:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2025-06-15T14:30:00Z"
+    },
+    "__v": 0
   },
   {
-    "user": { "$oid": "666000000000000000000002" },
-    "company": "Google",
-    "role": "Software Engineer",
+    "_id": {
+      "$oid": "6a7b8c9d0e1f2a3b4c5d6e7a"
+    },
+    "user": {
+      "$oid": "685281c4df034aeaa9077734"
+    },
+    "company": "DataSystems LLC",
+    "role": "Data Architect",
     "status": "Applied",
-    "appliedDate": { "$date": "2025-06-02T10:00:00Z" },
-    "notes": "Waiting for response.",
-    "resumeLink": "https://resume.link/bob",
-    "location": "Bangalore",
-    "companyWebsite": "https://google.com"
+    "appliedDate": {
+      "$date": "2025-06-12T11:30:00Z"
+    },
+    "notes": "Need to follow up in 2 weeks",
+    "resumeLink": "https://storage.example.com/resumes/data_arch_app.pdf",
+    "location": "Remote",
+    "companyWebsite": "https://datasystems.example.io",
+    "createdAt": {
+      "$date": "2025-06-12T12:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2025-06-12T12:00:00Z"
+    },
+    "__v": 0
   },
   {
-    "user": { "$oid": "666000000000000000000003" },
-    "company": "Microsoft",
-    "role": "Cloud Architect",
-    "status": "Rejected",
-    "appliedDate": { "$date": "2025-05-28T10:00:00Z" },
-    "notes": "Rejected after final round.",
-    "resumeLink": "https://resume.link/charlie",
-    "location": "Hyderabad",
-    "companyWebsite": "https://microsoft.com"
-  },
-  {
-    "user": { "$oid": "666000000000000000000004" },
-    "company": "Amazon",
+    "_id": {
+      "$oid": "2d3e4f5a6b7c8d9e0f1a2b3d"
+    },
+    "user": {
+      "$oid": "685281c4df034aeaa9077734"
+    },
+    "company": "CloudNine Technologies",
     "role": "DevOps Engineer",
     "status": "Offer",
-    "appliedDate": { "$date": "2025-06-03T10:00:00Z" },
-    "notes": "Offer letter received.",
-    "resumeLink": "https://resume.link/admin",
-    "location": "Pune",
-    "companyWebsite": "https://amazon.jobs"
+    "appliedDate": {
+      "$date": "2025-05-28T14:00:00Z"
+    },
+    "notes": "Offer received: $120k + 10% bonus. Considering other options.",
+    "resumeLink": "https://storage.example.com/resumes/devops_cloudnine.pdf",
+    "location": "Austin, TX",
+    "companyWebsite": "https://cloudnine.example.tech",
+    "createdAt": {
+      "$date": "2025-05-28T14:30:00Z"
+    },
+    "updatedAt": {
+      "$date": "2025-06-17T09:15:00Z"
+    },
+    "__v": 0
   },
   {
-    "user": { "$oid": "666000000000000000000005" },
-    "company": "Infosys",
-    "role": "Frontend Developer",
-    "status": "Accepted",
-    "appliedDate": { "$date": "2025-06-05T10:00:00Z" },
-    "notes": "Accepted offer.",
-    "resumeLink": "https://resume.link/deepa",
-    "location": "Delhi",
-    "companyWebsite": "https://infosys.com"
-  },
-  {
-    "user": { "$oid": "666000000000000000000006" },
-    "company": "TCS",
-    "role": "Backend Developer",
-    "status": "Applied",
-    "appliedDate": { "$date": "2025-06-06T10:00:00Z" },
-    "notes": "",
-    "resumeLink": "https://resume.link/farhan",
-    "location": "Chennai",
-    "companyWebsite": "https://tcs.com"
-  },
-  {
-    "user": { "$oid": "666000000000000000000007" },
-    "company": "Zomato",
-    "role": "Full Stack Engineer",
-    "status": "Interview",
-    "appliedDate": { "$date": "2025-06-07T10:00:00Z" },
-    "notes": "Scheduled tech interview.",
-    "resumeLink": "https://resume.link/geeta",
-    "location": "Gurgaon",
-    "companyWebsite": "https://zomato.com"
-  },
-  {
-    "user": { "$oid": "666000000000000000000008" },
-    "company": "Swiggy",
-    "role": "Mobile App Developer",
-    "status": "Applied",
-    "appliedDate": { "$date": "2025-06-08T10:00:00Z" },
-    "notes": "",
-    "resumeLink": "https://resume.link/harsh",
-    "location": "Mumbai",
-    "companyWebsite": "https://swiggy.com"
-  },
-  {
-    "user": { "$oid": "666000000000000000000009" },
-    "company": "Paytm",
-    "role": "QA Engineer",
+    "_id": {
+      "$oid": "9e8d7c6b5a4f3e2d1c0b9a8c"
+    },
+    "user": {
+      "$oid": "685281c4df034aeaa9077734"
+    },
+    "company": "FinBank Global",
+    "role": "Security Analyst",
     "status": "Rejected",
-    "appliedDate": { "$date": "2025-06-09T10:00:00Z" },
-    "notes": "Didn't clear HR round.",
-    "resumeLink": "https://resume.link/isha",
-    "location": "Noida",
-    "companyWebsite": "https://paytm.com"
+    "appliedDate": {
+      "$date": "2025-06-05T08:45:00Z"
+    },
+    "notes": "Position filled internally",
+    "resumeLink": "https://storage.example.com/resumes/security_finbank.pdf",
+    "location": "New York, NY",
+    "companyWebsite": "https://finbank.example.org/jobs",
+    "createdAt": {
+      "$date": "2025-06-05T09:00:00Z"
+    },
+    "updatedAt": {
+      "$date": "2025-06-14T16:20:00Z"
+    },
+    "__v": 0
   },
   {
-    "user": { "$oid": "666000000000000000000010" },
-    "company": "Byju's",
-    "role": "Data Analyst",
-    "status": "Interview",
-    "appliedDate": { "$date": "2025-06-10T10:00:00Z" },
-    "notes": "Waiting for final interview.",
-    "resumeLink": "https://resume.link/jatin",
-    "location": "Bangalore",
-    "companyWebsite": "https://byjus.com"
+    "_id": {
+      "$oid": "0a1b2c3d4e5f6a7b8c9d0e2a"
+    },
+    "user": {
+      "$oid": "685281c4df034aeaa9077734"
+    },
+    "company": "GreenSolutions",
+    "role": "Sustainability Consultant",
+    "status": "Accepted",
+    "appliedDate": {
+      "$date": "2025-05-20T10:15:00Z"
+    },
+    "notes": "Accepted offer! Starting July 1st",
+    "resumeLink": "https://storage.example.com/resumes/greensolutions_final.pdf",
+    "location": "Portland, OR (Flexible)",
+    "companyWebsite": "https://greensolutions.example.eco",
+    "createdAt": {
+      "$date": "2025-05-20T10:30:00Z"
+    },
+    "updatedAt": {
+      "$date": "2025-06-10T13:45:00Z"
+    },
+    "__v": 0
   }
 ]

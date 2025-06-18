@@ -4,35 +4,28 @@ import {
   getUserById,
   updateUserRole,
   deleteUser,
-  getAllJobs,
-  getJobById,
-  updateJobStatus,
+  createJob,
+  updateJob,
   deleteJob
 } from '../controllers/admin.controller.js';
+
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { verifyAdmin } from '../middlewares/admin.middleware.js';
 
 const router = express.Router();
 
-// Apply both middlewares to all admin routes
 router.use(verifyJWT, verifyAdmin);
 
-// User management routes
-router.route('/users')
-  .get(getAllUsers);
-
+// User management
+router.get('/users', getAllUsers);
 router.route('/users/:id')
   .get(getUserById)
   .patch(updateUserRole)
   .delete(deleteUser);
 
-// Job management routes (admin-only versions)
-router.route('/jobs')
-  .get(getAllJobs);
-
-router.route('/jobs/:id')
-  .get(getJobById)
-  .patch(updateJobStatus)
-  .delete(deleteJob);
+// Job management
+router.route('/jobs').post(createJob);        // Create job
+router.patch('/jobs/:id', updateJob);   // Update job
+router.delete('/jobs/:id', deleteJob);  // Delete job
 
 export default router;

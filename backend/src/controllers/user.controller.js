@@ -1,5 +1,4 @@
-import { User } from '../models/user.models.js';
-
+import { User } from '../models/user.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ErrorResponse } from '../utils/errorResponse.js';
 import { apiResponse } from "../utils/apiResponse.js";
@@ -13,25 +12,41 @@ const isProduction = process.env.NODE_ENV === "production";
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId);
-        const accessToken = user.generateAccessToken();
-        const refreshToken = user.generateRefreshToken();
+        if (!user) {
+            throw new Error("User not found");
+        }
 
+        const accessToken = jwt.sign(
+            { _id: user._id },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '15m' }
+        );
+
+        const refreshToken = jwt.sign(
+            { _id: user._id },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '7d' }
+        );
+
+        // Save refresh token to user document
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
-        return { accessToken, refreshToken };
 
+        return { accessToken, refreshToken };
     } catch (error) {
-        throw new ErrorResponse(500, "Something went wrong while generating refresh and access token");
+        throw new Error(`Token generation failed: ${error.message}`);
     }
 };
 
 const registerUser = asyncHandler(async (req, res) => {
     const { email, phoneNumber, fullname, password, role } = req.body;
     
+    // Validate required fields
     if ([fullname, email, password, role, phoneNumber].some((field) => field?.trim() === "")) {
         throw new ErrorResponse(400, "All fields are required");
     }
 
+    // Check if user already exists
     const existedUser = await User.findOne({
         $or: [{ email }, { phoneNumber }]
     });
@@ -40,6 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ErrorResponse(409, "User with same email or phone number already exists!");
     }
 
+    // Create new user
     const user = await User.create({
         fullname,
         email,
@@ -48,6 +64,7 @@ const registerUser = asyncHandler(async (req, res) => {
         role
     });
 
+    // Return user data without sensitive information
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     );
@@ -55,24 +72,19 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!createdUser) {
         throw new ErrorResponse(500, "Something went wrong while registering a user");
     }
-    
-    const cart = await Cart.create({
-        owner: user._id,
-        products: []
-    });
-    
-    if (!cart) {
-        throw new ErrorResponse(500, "User cart creation failed");
-    }
 
     return res
         .status(201)
-        .json(new apiResponse(200, createdUser, "User registered successfully"));
+        .json(new apiResponse(201, createdUser, "User registered successfully"));
 });
+
+
+
 
 const loginUser = asyncHandler(async (req, res) => {
     const { email, phoneNumber, password } = req.body;
     
+    // Validation
     if (!email && !phoneNumber) {
         throw new ErrorResponse(400, "Email or phone number is required");
     }
@@ -81,41 +93,52 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ErrorResponse(400, "Password is required");
     }
     
+    // Find user
     const user = await User.findOne({
         $or: [{ phoneNumber }, { email }]
-    });
+    }).select('+password'); // Include password field for verification
 
     if (!user) {
-        throw new ErrorResponse(404, "No user found with the provided email or phone number");
+        throw new ErrorResponse(404, "User not found with provided credentials");
     }
 
+    // Verify password
     const isPasswordValid = await user.isPasswordCorrect(password);
-
     if (!isPasswordValid) {
         throw new ErrorResponse(401, "Invalid credentials");
     }
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+    try {
+        // Generate tokens
+        const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
+        
+        // Get user without sensitive data
+        const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
-    const options = {
-        httpOnly: true,
-        secure: isProduction,  
-        sameSite: isProduction ? "lax" : "strict", 
-        domain: isProduction ? ".satyamcodes.online" : undefined, 
-    };
+        // Cookie options
+        const isProduction = process.env.NODE_ENV === 'production';
+        const options = {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            domain: isProduction ? process.env.COOKIE_DOMAIN : undefined
+        };
 
-    return res
-        .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
-        .json(
-            new apiResponse(200, { 
-                user: loggedInUser, 
-                accessToken, 
-                refreshToken 
-            }, "User logged in successfully")
-        );
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new apiResponse(200, { 
+                    user: loggedInUser, 
+                    accessToken, 
+                    refreshToken 
+                }, "User logged in successfully")
+            );
+    } catch (error) {
+        throw new ErrorResponse(500, `Login failed: ${error.message}`);
+    }
 });
 
 const logoutUser = asyncHandler(async (req, res) => {

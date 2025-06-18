@@ -1,10 +1,11 @@
-import { User } from '../models/user.models.js';
-import { JobApplication } from '../models/jobApplication.models.js';
+//admin.controllers.js
+import { User } from '../models/user.model.js';
+import { Job } from '../models/job.model.js';  // Import the Job model
 import { ErrorResponse } from '../utils/errorResponse.js';
 import { apiResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
-// User Management
+// User Management (unchanged)
 export const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find({}).select('-password -refreshToken');
   res.status(200).json(new apiResponse(200, users, "All users retrieved successfully"));
@@ -45,64 +46,72 @@ export const deleteUser = asyncHandler(async (req, res) => {
     throw new ErrorResponse(404, "User not found");
   }
 
-  // Optionally: Delete all job applications associated with this user
-  await JobApplication.deleteMany({ user: req.params.id });
+  // Delete all jobs posted by this user
+  await Job.deleteMany({ postedBy: req.params.id });
 
   res.status(200).json(new apiResponse(200, {}, "User deleted successfully"));
 });
 
-// Job Management
-export const getAllJobs = asyncHandler(async (req, res) => {
-  const { status, user } = req.query;
-  
-  const filter = {};
-  if (status) filter.status = status;
-  if (user) filter.user = user;
+// Job Management (updated to match the Job model)
+export const createJob = asyncHandler(async (req, res) => {
+  const {
+    companyName,
+    jobTitle,
+    jobDescription,
+    jobType,
+    location,
+    applicationLink
+  } = req.body;
 
-  const jobs = await JobApplication.find(filter)
-    .populate('user', 'fullname email phoneNumber')
-    .sort({ appliedDate: -1 });
+  const job = await Job.create({
+    companyName,
+    jobTitle,
+    jobDescription,
+    jobType,
+    location,
+    applicationLink,
+    postedBy: req.user._id  // The admin user creating the job
+  });
 
-  res.status(200).json(new apiResponse(200, jobs, "All job applications retrieved successfully"));
+  res.status(201).json(new apiResponse(201, job, "Job created successfully"));
 });
 
-export const getJobById = asyncHandler(async (req, res) => {
-  const job = await JobApplication.findById(req.params.id)
-    .populate('user', 'fullname email phoneNumber');
+export const updateJob = asyncHandler(async (req, res) => {
+  const {
+    companyName,
+    jobTitle,
+    jobDescription,
+    jobType,
+    location,
+    applicationLink
+  } = req.body;
 
-  if (!job) {
-    throw new ErrorResponse(404, "Job application not found");
-  }
-
-  res.status(200).json(new apiResponse(200, job, "Job application retrieved successfully"));
-});
-
-export const updateJobStatus = asyncHandler(async (req, res) => {
-  const { status } = req.body;
-  
-  if (!['Applied', 'Interview', 'Offer', 'Rejected', 'Accepted'].includes(status)) {
-    throw new ErrorResponse(400, "Invalid status specified");
-  }
-
-  const job = await JobApplication.findByIdAndUpdate(
+  const job = await Job.findByIdAndUpdate(
     req.params.id,
-    { status },
+    {
+      companyName,
+      jobTitle,
+      jobDescription,
+      jobType,
+      location,
+      applicationLink
+    },
     { new: true }
-  ).populate('user', 'fullname email phoneNumber');
+  );
 
   if (!job) {
-    throw new ErrorResponse(404, "Job application not found");
+    throw new ErrorResponse(404, "Job not found");
   }
 
-  res.status(200).json(new apiResponse(200, job, "Job status updated successfully"));
+  res.status(200).json(new apiResponse(200, job, "Job updated successfully"));
 });
 
 export const deleteJob = asyncHandler(async (req, res) => {
-  const job = await JobApplication.findByIdAndDelete(req.params.id);
+  const job = await Job.findByIdAndDelete(req.params.id);
   
   if (!job) {
-    throw new ErrorResponse(404, "Job application not found");
+    throw new ErrorResponse(404, "Job not found");
   }
 
-  res.status(200).json(new apiResponse(200, {}, "Job application deleted successfully"));
+  res.status(200).json(new apiResponse(200, {}, "Job deleted successfully"));
 });
