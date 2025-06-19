@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-
+import { verifyAuth } from './authThunks';
 const initialState = {
   user: null,
   isAuthenticated: false,
@@ -64,6 +64,25 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(verifyAuth.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(verifyAuth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(verifyAuth.rejected, (state) => {
+        state.loading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+      });
+  }
+
 });
 
 export const {

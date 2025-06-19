@@ -22,11 +22,9 @@ const store = configureStore({
 });
 
 // Rehydrate user from token on app start
-const token = localStorage.getItem('token');
-if (token) {
-  // Optionally, fetch user profile from API and dispatch setUser
-  // For now, just set isAuthenticated to true
-  store.dispatch({ type: 'auth/loginSuccess', payload: { user: null, token } });
-}
+// const token = localStorage.getItem('accessToken');
+// if (token) {
+//   store.dispatch({ type: 'auth/loginSuccess', payload: { user: null, token } });
+// }
 
 export default store; 

@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { userAPI } from '../../api/userAPI';
 import { loginStart, loginSuccess, loginFailure, registerStart, registerSuccess, registerFailure, logout as logoutAction } from './authSlice';
+import api from '../../api/axiosConfig';
 
 // Login thunk
 export const loginUser = createAsyncThunk(
@@ -56,11 +57,28 @@ export const verifyToken = createAsyncThunk(
   async (_, { dispatch }) => {
     try {
       const response = await userAPI.getProfile();
-      dispatch({ type: 'auth/setUser', payload: response.user });
+      dispatch({ type: 'auth/setUser', payload: response });
       return response;
     } catch (error) {
       dispatch({ type: 'auth/logout' });
       throw error;
     }
   }
-); 
+);
+
+export const verifyAuth = createAsyncThunk(
+  'auth/verify',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token || localStorage.getItem('accessToken');
+      if (!token) {
+        return rejectWithValue('No token found');
+      }
+      const response = await api.get('/users/me');
+      return { user: response.data.data, token };
+    } catch (err) {
+      localStorage.removeItem('accessToken');
+      return rejectWithValue(err.response?.data?.message || 'Not authenticated');
+    }
+  }
+);

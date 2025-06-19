@@ -26,7 +26,7 @@ const JobApplication = () => {
     setSuccess(false);
     const applicationData = {
       ...form,
-      jobId: id,
+      job: id,
     };
     try {
       await dispatch(createJobApplication(applicationData));

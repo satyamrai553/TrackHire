@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -13,20 +12,12 @@ import JobDetails from './pages/JobDetails';
 import JobApplication from './pages/JobApplication';
 import Companies from './pages/Companies';
 import Resources from './pages/Resources';
-import { verifyToken } from './features/auth/authThunks';
+import AuthPersist from './components/AuthPersist';
 
 const App = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      dispatch(verifyToken());
-    }
-  }, [dispatch]);
-
   return (
     <Router>
+      <AuthPersist />
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <div className="pt-16">
