@@ -1,49 +1,33 @@
 import api from './axiosConfig';
 
-export const applicationAPI = {
-  // Get all applications (for admin)
-  getApplications: async (params = {}) => {
-    const response = await api.get('/applications', { params });
-    return response.data;
-  },
-
-  // Get application by ID
-  getApplication: async (id) => {
-    const response = await api.get(`/applications/${id}`);
-    return response.data;
-  },
-
-  // Create new application
+export const jobApplicationAPI = {
+  // Create a new job application
   createApplication: async (applicationData) => {
-    const response = await api.post('/applications', applicationData);
+    const response = await api.post('/job-applications', applicationData);
     return response.data;
   },
 
-  // Update application status
-  updateApplicationStatus: async (id, status) => {
-    const response = await api.put(`/applications/${id}/status`, { status });
+  // Get all applications for the logged-in user
+  getAllApplications: async () => {
+    const response = await api.get('/job-applications');
     return response.data;
   },
 
-  // Delete application
+  // Get a single job application by ID
+  getApplicationById: async (id) => {
+    const response = await api.get(`/job-applications/${id}`);
+    return response.data;
+  },
+
+  // Update job application status (used by admin or user)
+  updateApplicationStatus: async (id, updateData) => {
+    const response = await api.put(`/job-applications/${id}`, updateData);
+    return response.data;
+  },
+
+  // Delete a job application
   deleteApplication: async (id) => {
-    const response = await api.delete(`/applications/${id}`);
+    const response = await api.delete(`/job-applications/${id}`);
     return response.data;
   },
-
-  // Get applications for a specific job
-  getJobApplications: async (jobId) => {
-    const response = await api.get(`/jobs/${jobId}/applications`);
-    return response.data;
-  },
-
-  // Upload resume
-  uploadResume: async (formData) => {
-    const response = await api.post('/applications/resume', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
-  }
-}; 
+};

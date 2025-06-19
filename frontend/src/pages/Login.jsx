@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api'; 
+import { userAPI } from '../api/userAPI.js';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../features/auth/authSlice';
 
@@ -18,17 +18,12 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     try {
-      const response = await api.post(
-        '/users/login',
-        formData,
-        {
-          withCredentials: true
-        }
-      );
-      console.log('Login response:', response.data);
-      const { user, accessToken } = response.data.data;
+      const response = await userAPI.login(formData); // ✅ fixed call
+      console.log('Login response:', response);
+
+      const { user, accessToken } = response.data;
       localStorage.setItem('accessToken', accessToken);
       dispatch(loginSuccess({ user, token: accessToken }));
       navigate('/dashboard');
@@ -63,7 +58,7 @@ const Login = () => {
               type="email"
               id="email"
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
               required
             />
@@ -76,7 +71,7 @@ const Login = () => {
               type="password"
               id="password"
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
               required
             />
