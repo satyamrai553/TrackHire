@@ -3,115 +3,102 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ErrorResponse } from '../utils/errorResponse.js';
 import { apiResponse } from '../utils/apiResponse.js';
 
-// User applies to a job
+// Create a job application (auth or guest)
 const createJobApplication = asyncHandler(async (req, res) => {
-    const {
-        companyName,
-        jobTitle,
-        jobDescription,
-        applicationLink,
-        location,
-        notes
-    } = req.body;
+  const { job, name, email, coverLetter } = req.body;
 
-    // Validate required fields
-    if (!companyName || !jobTitle) {
-        throw new ErrorResponse(400, "Company name and job title are required");
+  if (!job || !coverLetter) {
+    throw new ErrorResponse(400, "Job ID and cover letter are required");
+  }
+
+  // Authenticated user: use user ID, skip name/email
+  const applicationData = {
+    job,
+    coverLetter,
+    submittedAt: new Date(),
+  };
+
+  if (req.user) {
+    applicationData.user = req.user._id;
+  } else {
+    if (!name || !email) {
+      throw new ErrorResponse(400, "Name and email are required for guest submissions");
     }
+    applicationData.name = name;
+    applicationData.email = email;
+  }
 
-    const jobApplication = await JobApplication.create({
-        companyName,
-        jobTitle,
-        jobDescription,
-        applicationLink,
-        location,
-        notes,
-        user: req.user._id,  // Automatically set to current user
-        status: 'Applied'    // Default status
-    });
+  const jobApplication = await JobApplication.create(applicationData);
 
-    return res
-        .status(201)
-        .json(new apiResponse(201, jobApplication, "Job application created successfully"));
+  return res.status(201).json(
+    new apiResponse(201, jobApplication, "Job application submitted successfully")
+  );
 });
 
-// Get user's own applications
+// Get all applications for a job (admin or job owner)
+const getApplicationsForJob = asyncHandler(async (req, res) => {
+  const jobId = req.params.jobId;
+
+  const applications = await JobApplication.find({ job: jobId })
+    .populate('user', 'name email')
+    .sort({ createdAt: -1 });
+
+  return res.status(200).json(
+    new apiResponse(200, applications, "Applications retrieved successfully")
+  );
+});
+
+// Get all applications for current user (authenticated only)
 const getAllJobApplicationsForUser = asyncHandler(async (req, res) => {
-    const { status } = req.query;
-    
-    const filter = { user: req.user._id };
-    if (status) filter.status = status;
+  const applications = await JobApplication.find({ user: req.user._id })
+    .populate('job')
+    .sort({ createdAt: -1 });
 
-    const jobApplications = await JobApplication.find(filter)
-        .sort({ applicationDate: -1 });
-
-    return res
-        .status(200)
-        .json(new apiResponse(200, jobApplications, "Job applications retrieved successfully"));
+  return res.status(200).json(
+    new apiResponse(200, applications, "Your applications retrieved successfully")
+  );
 });
 
-// Get one application (user can only access their own)
+// Get a single application by ID (for owner or admin)
 const getJobApplicationById = asyncHandler(async (req, res) => {
-    const jobApplication = await JobApplication.findOne({
-        _id: req.params.id,
-        user: req.user._id
-    });
+  const application = await JobApplication.findById(req.params.id)
+    .populate('job')
+    .populate('user', 'name email');
 
-    if (!jobApplication) {
-        throw new ErrorResponse(404, "Job application not found");
-    }
+  if (!application) {
+    throw new ErrorResponse(404, "Application not found");
+  }
 
-    return res
-        .status(200)
-        .json(new apiResponse(200, jobApplication, "Job application retrieved successfully"));
+  // If not admin, ensure it's the user's own application
+  if (req.user && !req.user.isAdmin && application.user?.toString() !== req.user._id.toString()) {
+    throw new ErrorResponse(403, "You are not authorized to access this application");
+  }
+
+  return res.status(200).json(
+    new apiResponse(200, application, "Application retrieved successfully")
+  );
 });
 
-// Update application status (user can update their own)
-const updateJobApplicationStatus = asyncHandler(async (req, res) => {
-    const { status } = req.body;
-    
-    if (!['Applied', 'Interview', 'Offer', 'Rejected', 'Accepted'].includes(status)) {
-        throw new ErrorResponse(400, "Invalid status specified");
-    }
-
-    const jobApplication = await JobApplication.findOneAndUpdate(
-        {
-            _id: req.params.id,
-            user: req.user._id
-        },
-        { status },
-        { new: true }
-    );
-
-    if (!jobApplication) {
-        throw new ErrorResponse(404, "Job application not found");
-    }
-
-    return res
-        .status(200)
-        .json(new apiResponse(200, jobApplication, "Job application status updated successfully"));
-});
-
-// Delete application (user can delete their own)
+// Delete an application (owner only)
 const deleteJobApplication = asyncHandler(async (req, res) => {
-    const jobApplication = await JobApplication.findOneAndDelete({
-        _id: req.params.id,
-        user: req.user._id
-    });
+  const application = await JobApplication.findOneAndDelete({
+    _id: req.params.id,
+    user: req.user._id,
+  });
 
-    if (!jobApplication) {
-        throw new ErrorResponse(404, "Job application not found");
-    }
+  if (!application) {
+    throw new ErrorResponse(404, "Application not found or not yours");
+  }
 
-    return res
-        .status(200)
-        .json(new apiResponse(200, {}, "Job application deleted successfully"));
+  return res.status(200).json(
+    new apiResponse(200, {}, "Application deleted successfully")
+  );
 });
 
 export {
-    createJobApplication,
-    getAllJobApplicationsForUser,
-    getJobApplicationById,
-    updateJobApplicationStatus,
-    deleteJobApplication
+  createJobApplication,
+  getApplicationsForJob,
+  getAllJobApplicationsForUser,
+  getJobApplicationById,
+  deleteJobApplication,
 };

@@ -75,7 +75,7 @@ const stats = [
 const Home = () => (
   <div className="bg-white">
     {/* Hero Section */}
-    <section className="relative bg-gradient-to-r from-blue-600 to-indigo-800 text-white py-20 px-4 text-center overflow-hidden">
+    <section className="relative bg-gradient-to-r from-blue-600 to-indigo-800 text-white pt-8 pb-20 px-4 text-center overflow-hidden">
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       </div>
@@ -88,7 +88,7 @@ const Home = () => (
         </p>
         <div className="flex flex-col md:flex-row justify-center gap-4">
           <Link
-            to="/dashboard"
+            to="/jobs"
             className="bg-white text-blue-600 font-semibold px-8 py-4 rounded-lg shadow-lg hover:bg-blue-50 transition-all transform hover:-translate-y-1 duration-300"
           >
             Browse Jobs

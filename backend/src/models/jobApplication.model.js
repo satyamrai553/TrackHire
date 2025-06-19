@@ -2,52 +2,50 @@ import mongoose, { Schema } from "mongoose";
 
 const jobApplicationSchema = new Schema(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
     job: {
       type: Schema.Types.ObjectId,
       ref: "Job",
       required: true,
     },
 
-    status: {
-      type: String,
-      enum: ["Applied", "Interview", "Offer", "Rejected", "Accepted"],
-      default: "Applied",
+    // If user is logged in
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
     },
 
-    appliedDate: {
-      type: Date,
-      required: [true, "Applied date is required"],
-    },
-
-    notes: {
+    // Guest applicant info (if user is not logged in)
+    name: {
       type: String,
-      trim: true,
-      maxlength: 1000,
-    },
-
-    resumeLink: {
-      type: String,
-      trim: true,
-      validate: {
-        validator: function (v) {
-          return !v || /^https?:\/\/.+/.test(v);
-        },
-        message: "Please enter a valid URL (starting with http or https)",
+      required: function () {
+        return !this.user;
       },
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: function () {
+        return !this.user;
+      },
+      trim: true,
+      lowercase: true,
+      match: [/.+\@.+\..+/, "Please enter a valid email"],
+    },
+
+    coverLetter: {
+      type: String,
+      required: [true, "Cover letter is required"],
+      maxlength: 2000,
+    },
+
+    submittedAt: {
+      type: Date,
+      default: Date.now,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export const JobApplication = mongoose.model(
-  "JobApplication",
-  jobApplicationSchema
-);
+export const JobApplication = mongoose.model("JobApplication", jobApplicationSchema);

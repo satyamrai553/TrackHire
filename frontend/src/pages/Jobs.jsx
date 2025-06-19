@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllJobs } from '../features/jobs/jobThunks.js'; // adjust the path as needed
+import { Link } from 'react-router-dom';
 
 const Jobs = () => {
   const dispatch = useDispatch();
-  const { jobs, loading, error } = useSelector((state) => state.job);
+  const { jobs, loading, error } = useSelector((state) => state.jobs);
 
   useEffect(() => {
     dispatch(fetchAllJobs());
@@ -32,12 +33,12 @@ const Jobs = () => {
                 {job.jobType}
               </p>
               <div className="mt-4">
-                <a
-                  href={`/jobs/${job._id}`}
+                <Link
+                  to={`/jobs/${job._id}`}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
                   View Details →
-                </a>
+                </Link>
               </div>
             </div>
           ))}

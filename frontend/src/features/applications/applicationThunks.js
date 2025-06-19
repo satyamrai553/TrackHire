@@ -1,5 +1,5 @@
 // features/application/applicationThunks.js
-import { jobApplicationAPI } from '../../api/jobApplicationAPI';
+import { jobApplicationAPI } from '../../api/applicationAPI.js';
 import {
   applicationRequestStart,
   applicationRequestFailure,
