@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../api/adminAPI';
-
 import { BarChartComponent as BarChart, PieChartComponent as PieChart } from '../components/Charts';
 
 const AdminDashboard = () => {
@@ -14,40 +13,44 @@ const AdminDashboard = () => {
     recentJobs: [],
     recentUsers: []
   });
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    } else if (!user || user.role !== 'admin') {
-      navigate('/');
-    }
+    if (!isAuthenticated) navigate('/login');
+    else if (user?.role !== 'admin') navigate('/');
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-
-        const [jobs, users] = await Promise.all([
+        const [jobsRes, usersRes] = await Promise.all([
           adminAPI.getAllJobs(),
           adminAPI.getAllUsers()
         ]);
 
+        const jobs = jobsRes;
+        const users = usersRes;
+        const totalApplications = jobs.reduce((sum, job) => sum + (job.applications?.length || 0), 0);
+        const pendingApplications = jobs.reduce(
+          (sum, job) => sum + (job.applications?.filter(a => a.status === 'Pending')?.length || 0),
+          0
+        );
+
         setStats({
           totalJobs: jobs.length,
           activeJobs: jobs.filter(job => job.status === 'Active').length,
-          totalApplications: jobs.reduce((acc, job) => acc + (job.applications?.length || 0), 0),
-          pendingApplications: jobs.reduce((acc, job) => acc + (job.applications?.filter(a => a.status === 'Pending')?.length || 0), 0),
+          totalApplications,
+          pendingApplications,
           recentJobs: jobs.slice(0, 5),
           recentUsers: users.slice(0, 5)
         });
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch dashboard data');
+        setError(err.response?.data?.message || 'Error loading dashboard data');
       } finally {
         setLoading(false);
       }
@@ -58,18 +61,14 @@ const AdminDashboard = () => {
     }
   }, [isAuthenticated, user]);
 
-  if (!isAuthenticated || !user || user.role !== 'admin') return null;
-  if (loading) return <div className="flex justify-center items-center h-64">Loading...</div>;
-  if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
+  if (!isAuthenticated || user?.role !== 'admin') return null;
+  if (loading) return <div className="text-center py-10">Loading...</div>;
+  if (error) return <div className="text-red-500 p-4 text-center">{error}</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-        <div className="text-sm text-gray-500">Last updated: {new Date().toLocaleString()}</div>
-      </div>
+      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard title="Total Jobs" value={stats.totalJobs} icon="📊" trend="up" percentage="12%" color="blue" />
         <StatCard title="Active Jobs" value={stats.activeJobs} icon="✅" trend="up" percentage="5%" color="green" />
@@ -77,39 +76,33 @@ const AdminDashboard = () => {
         <StatCard title="Pending Applications" value={stats.pendingApplications} icon="⏳" trend="up" percentage="8%" color="yellow" />
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-lg font-semibold mb-4">Applications by Status</h3>
-          <div className="h-64">
-            <PieChart data={[
-              { name: 'Applied', value: 45 },
-              { name: 'Interview', value: 25 },
-              { name: 'Offer', value: 10 },
-              { name: 'Rejected', value: 15 },
-              { name: 'Accepted', value: 5 }
-            ]} />
-          </div>
+          <PieChart data={[
+            { name: 'Applied', value: 45 },
+            { name: 'Interview', value: 25 },
+            { name: 'Offer', value: 10 },
+            { name: 'Rejected', value: 15 },
+            { name: 'Accepted', value: 5 },
+          ]} />
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-lg font-semibold mb-4">Jobs by Month</h3>
-          <div className="h-64">
-            <BarChart data={[
-              { month: 'Jan', jobs: 20 },
-              { month: 'Feb', jobs: 35 },
-              { month: 'Mar', jobs: 28 },
-              { month: 'Apr', jobs: 42 },
-              { month: 'May', jobs: 30 },
-              { month: 'Jun', jobs: 25 }
-            ]} />
-          </div>
+          <BarChart data={[
+            { month: 'Jan', jobs: 20 },
+            { month: 'Feb', jobs: 35 },
+            { month: 'Mar', jobs: 28 },
+            { month: 'Apr', jobs: 42 },
+            { month: 'May', jobs: 30 },
+            { month: 'Jun', jobs: 25 }
+          ]} />
         </div>
       </div>
 
-      {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentTable title="Recent Jobs" data={stats.recentJobs} columns={['companyName', 'jobTitle', 'status', 'applicationsCount']} linkPath="/admin/jobs" />
-        <RecentTable title="New Users" data={stats.recentUsers} columns={['fullName', 'email', 'role']} linkPath="/admin/users" />
+        <RecentTable title="Recent Jobs" data={stats.recentJobs} columns={["companyName", "jobTitle", "status", "applications"]} />
+        <RecentTable title="Recent Users" data={stats.recentUsers} columns={["fullname", "email", "role"]} />
       </div>
     </div>
   );
@@ -124,47 +117,43 @@ const StatCard = ({ title, value, icon, trend, percentage, color }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start">
+    <div className="bg-white p-6 rounded-xl shadow hover:shadow-md">
+      <div className="flex justify-between items-center">
         <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="text-3xl font-bold mt-1">{value}</p>
+          <p className="text-sm text-gray-500">{title}</p>
+          <p className="text-3xl font-bold">{value}</p>
         </div>
-        <div className={`p-3 rounded-lg ${colors[color]}`}>
+        <div className={`p-3 rounded-full ${colors[color]}`}>
           <span className="text-xl">{icon}</span>
         </div>
       </div>
-      <div className={`mt-4 text-sm ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-        <span>{trend === 'up' ? '↑' : '↓'} {percentage}</span>
-        <span className="ml-1 text-gray-500">vs last month</span>
-      </div>
+      <p className={`mt-4 text-sm ${trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+        {trend === 'up' ? '↑' : '↓'} {percentage} <span className="text-gray-400">vs last month</span>
+      </p>
     </div>
   );
 };
 
-const RecentTable = ({ title, data, columns, linkPath }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm">
-    <div className="flex justify-between items-center mb-4">
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <a href={linkPath} className="text-sm text-blue-600 hover:underline">View all</a>
-    </div>
+const RecentTable = ({ title, data, columns }) => (
+  <div className="bg-white p-6 rounded-xl shadow">
+    <h3 className="text-lg font-semibold mb-4">{title}</h3>
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
+      <table className="min-w-full">
         <thead>
           <tr>
-            {columns.map(col => (
-              <th key={col} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {columns.map((col) => (
+              <th key={col} className="text-left px-4 py-2 text-xs text-gray-500 uppercase tracking-wider">
                 {col}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="text-sm text-gray-700">
           {data.map((item, index) => (
             <tr key={index} className="hover:bg-gray-50">
-              {columns.map(col => (
-                <td key={col} className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                  {col === 'applicationsCount' ? item.applications?.length ?? 0 : item[col]}
+              {columns.map((col) => (
+                <td key={col} className="px-4 py-2">
+                  {col === 'applications' ? item.applications?.length ?? 0 : item[col]}
                 </td>
               ))}
             </tr>

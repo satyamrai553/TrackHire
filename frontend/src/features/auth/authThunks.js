@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { authAPI } from '../../api/authAPI';
+import { userAPI } from '../../api/userAPI';
 import { loginStart, loginSuccess, loginFailure, registerStart, registerSuccess, registerFailure, logout as logoutAction } from './authSlice';
 
 // Login thunk
@@ -25,7 +25,7 @@ export const registerUser = createAsyncThunk(
   async (userData, { dispatch }) => {
     try {
       dispatch(registerStart());
-      const response = await authAPI.register(userData);
+      const response = await userAPI.register(userData);
       dispatch(registerSuccess(response));
       return response;
     } catch (error) {
@@ -41,7 +41,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { dispatch }) => {
     try {
-      await authAPI.logout();
+      await userAPI.logout();
     } catch (error) {
       // Optionally handle error
     } finally {
@@ -55,7 +55,7 @@ export const verifyToken = createAsyncThunk(
   'auth/verifyToken',
   async (_, { dispatch }) => {
     try {
-      const response = await authAPI.verifyToken();
+      const response = await userAPI.getProfile();
       dispatch({ type: 'auth/setUser', payload: response.user });
       return response;
     } catch (error) {

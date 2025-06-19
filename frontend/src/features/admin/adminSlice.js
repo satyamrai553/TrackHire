@@ -1,130 +1,55 @@
+// features/admin/adminSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  loginUser,
-  registerUser,
-  logoutUser
-} from '../auth/authThunks';
-// import { setCookie, deleteCookie } from '../../utils/cookies'; // Removed because file does not exist
-
-// Status constants for consistent state tracking
-const Status = {
-  IDLE: 'idle',
-  LOADING: 'loading',
-  SUCCEEDED: 'succeeded',
-  FAILED: 'failed',
-};
 
 const initialState = {
-  user: null,
-  accessToken: null,
-  refreshToken: null,
-  isAuthenticated: false,
-  isAdmin: false,
-  status: Status.IDLE,
+  users: [],
+  jobs: [],
+  loading: false,
   error: null,
 };
 
-const authSlice = createSlice({
-  name: 'auth',
+const adminSlice = createSlice({
+  name: 'admin',
   initialState,
   reducers: {
-    // Reset auth state
-    resetAuthState: () => initialState,
-    
-    // Set credentials from cookies/initial load
-    setCredentials: (state, action) => {
-      const { user, accessToken, refreshToken } = action.payload;
-      state.user = user;
-      state.accessToken = accessToken;
-      state.refreshToken = refreshToken;
-      state.isAuthenticated = true;
-      state.isAdmin = user?.role === 'admin';
-      // Optionally store tokens in localStorage
-      if (accessToken) localStorage.setItem('accessToken', accessToken);
-      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-    },
-    
-    // Clear credentials on logout
-    clearCredentials: (state) => {
-      state.user = null;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.isAuthenticated = false;
-      state.isAdmin = false;
-      // Remove tokens from localStorage
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-    },
-    
-    // Update user profile data
-    updateUserProfile: (state, action) => {
-      if (state.user) {
-        state.user = { ...state.user, ...action.payload };
-      }
-    },
-  },
-  extraReducers: (builder) => {
-    // Login Thunk Cases
-    builder.addCase(loginUser.pending, (state) => {
-      state.status = Status.LOADING;
+    adminRequestStart: (state) => {
+      state.loading = true;
       state.error = null;
-    });
-    builder.addCase(loginUser.fulfilled, (state, action) => {
-      const { user, accessToken, refreshToken } = action.payload;
-      state.user = user;
-      state.accessToken = accessToken;
-      state.refreshToken = refreshToken;
-      state.isAuthenticated = true;
-      state.isAdmin = user.role === 'admin';
-      state.status = Status.SUCCEEDED;
-      // Store tokens in localStorage
-      if (accessToken) localStorage.setItem('accessToken', accessToken);
-      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-    });
-    builder.addCase(loginUser.rejected, (state, action) => {
-      state.status = Status.FAILED;
-      state.error = action.payload || 'Login failed';
-    });
+    },
+    adminRequestFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
 
-    // Register Thunk Cases
-    builder.addCase(registerUser.pending, (state) => {
-      state.status = Status.LOADING;
-      state.error = null;
-    });
-    builder.addCase(registerUser.fulfilled, (state) => {
-      state.status = Status.SUCCEEDED;
-    });
-    builder.addCase(registerUser.rejected, (state, action) => {
-      state.status = Status.FAILED;
-      state.error = action.payload || 'Registration failed';
-    });
+    // User reducers
+    setUsers: (state, action) => {
+      state.users = action.payload;
+      state.loading = false;
+    },
+    removeUser: (state, action) => {
+      state.users = state.users.filter(user => user._id !== action.payload);
+      state.loading = false;
+    },
 
-    // Logout Thunk Cases
-    builder.addCase(logoutUser.fulfilled, (state) => {
-      Object.assign(state, initialState);
-      // Remove tokens from localStorage
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-    });
-  },
+    // Job reducers
+    setJobs: (state, action) => {
+      state.jobs = action.payload;
+      state.loading = false;
+    },
+    removeJob: (state, action) => {
+      state.jobs = state.jobs.filter(job => job._id !== action.payload);
+      state.loading = false;
+    }
+  }
 });
 
-// Export actions
-export const { 
-  resetAuthState, 
-  setCredentials, 
-  clearCredentials, 
-  updateUserProfile 
-} = authSlice.actions;
+export const {
+  adminRequestStart,
+  adminRequestFailure,
+  setUsers,
+  removeUser,
+  setJobs,
+  removeJob
+} = adminSlice.actions;
 
-// Export selectors
-export const selectCurrentUser = (state) => state.auth.user;
-export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
-export const selectIsAdmin = (state) => state.auth.isAdmin;
-export const selectAuthStatus = (state) => state.auth.status;
-export const selectAuthError = (state) => state.auth.error;
-
-// Export status constants
-export { Status };
-
-export default authSlice.reducer;
+export default adminSlice.reducer;

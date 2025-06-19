@@ -1,3 +1,4 @@
+// features/application/applicationSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -8,107 +9,51 @@ const initialState = {
 };
 
 const applicationSlice = createSlice({
-  name: 'applications',
+  name: 'application',
   initialState,
   reducers: {
-    fetchApplicationsStart: (state) => {
+    applicationRequestStart: (state) => {
       state.loading = true;
       state.error = null;
     },
-    fetchApplicationsSuccess: (state, action) => {
+    applicationRequestFailure: (state, action) => {
       state.loading = false;
+      state.error = action.payload;
+    },
+    setApplications: (state, action) => {
       state.applications = action.payload;
-      state.error = null;
-    },
-    fetchApplicationsFailure: (state, action) => {
       state.loading = false;
-      state.error = action.payload;
     },
-    fetchApplicationStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    fetchApplicationSuccess: (state, action) => {
-      state.loading = false;
+    setCurrentApplication: (state, action) => {
       state.currentApplication = action.payload;
-      state.error = null;
-    },
-    fetchApplicationFailure: (state, action) => {
       state.loading = false;
-      state.error = action.payload;
     },
-    createApplicationStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    createApplicationSuccess: (state, action) => {
-      state.loading = false;
+    addApplication: (state, action) => {
       state.applications.unshift(action.payload);
-      state.error = null;
-    },
-    createApplicationFailure: (state, action) => {
       state.loading = false;
-      state.error = action.payload;
     },
-    updateApplicationStatusStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    updateApplicationStatusSuccess: (state, action) => {
-      state.loading = false;
-      const { id, status } = action.payload;
-      const index = state.applications.findIndex(app => app.id === id);
+    updateApplication: (state, action) => {
+      const index = state.applications.findIndex(app => app._id === action.payload._id);
       if (index !== -1) {
-        state.applications[index].status = status;
+        state.applications[index] = action.payload;
       }
-      if (state.currentApplication?.id === id) {
-        state.currentApplication.status = status;
-      }
-      state.error = null;
-    },
-    updateApplicationStatusFailure: (state, action) => {
       state.loading = false;
-      state.error = action.payload;
     },
-    deleteApplicationStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    deleteApplicationSuccess: (state, action) => {
+    removeApplication: (state, action) => {
+      state.applications = state.applications.filter(app => app._id !== action.payload);
       state.loading = false;
-      state.applications = state.applications.filter(app => app.id !== action.payload);
-      if (state.currentApplication?.id === action.payload) {
-        state.currentApplication = null;
-      }
-      state.error = null;
-    },
-    deleteApplicationFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    clearApplicationError: (state) => {
-      state.error = null;
-    },
-  },
+    }
+  }
 });
 
 export const {
-  fetchApplicationsStart,
-  fetchApplicationsSuccess,
-  fetchApplicationsFailure,
-  fetchApplicationStart,
-  fetchApplicationSuccess,
-  fetchApplicationFailure,
-  createApplicationStart,
-  createApplicationSuccess,
-  createApplicationFailure,
-  updateApplicationStatusStart,
-  updateApplicationStatusSuccess,
-  updateApplicationStatusFailure,
-  deleteApplicationStart,
-  deleteApplicationSuccess,
-  deleteApplicationFailure,
-  clearApplicationError,
+  applicationRequestStart,
+  applicationRequestFailure,
+  setApplications,
+  setCurrentApplication,
+  addApplication,
+  updateApplication,
+  removeApplication
 } = applicationSlice.actions;
 
-export default applicationSlice.reducer; 
+export default applicationSlice.reducer;

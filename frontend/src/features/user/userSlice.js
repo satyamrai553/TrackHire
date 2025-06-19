@@ -1,72 +1,92 @@
+// userSlice.js
 import { createSlice } from '@reduxjs/toolkit';
+import {
+  fetchUserProfile,
+  updateUserProfile,
+  changeUserPassword,
+  uploadUserAvatar,
+} from './userThunks';
 
 const initialState = {
   profile: null,
-  applications: [],
   loading: false,
   error: null,
+  successMessage: null,
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    fetchProfileStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    fetchProfileSuccess: (state, action) => {
-      state.loading = false;
-      state.profile = action.payload;
-      state.error = null;
-    },
-    fetchProfileFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    updateProfileStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    updateProfileSuccess: (state, action) => {
-      state.loading = false;
-      state.profile = action.payload;
-      state.error = null;
-    },
-    updateProfileFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    fetchApplicationsStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    fetchApplicationsSuccess: (state, action) => {
-      state.loading = false;
-      state.applications = action.payload;
-      state.error = null;
-    },
-    fetchApplicationsFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
     clearUserError: (state) => {
       state.error = null;
     },
+    clearUserSuccess: (state) => {
+      state.successMessage = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+
+      // Fetch profile
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profile = action.payload;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Update profile
+      .addCase(updateUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profile = action.payload;
+        state.successMessage = 'Profile updated successfully';
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Change password
+      .addCase(changeUserPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(changeUserPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = 'Password changed successfully';
+      })
+      .addCase(changeUserPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Upload avatar
+      .addCase(uploadUserAvatar.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(uploadUserAvatar.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profile = action.payload;
+        state.successMessage = 'Avatar updated successfully';
+      })
+      .addCase(uploadUserAvatar.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const {
-  fetchProfileStart,
-  fetchProfileSuccess,
-  fetchProfileFailure,
-  updateProfileStart,
-  updateProfileSuccess,
-  updateProfileFailure,
-  fetchApplicationsStart,
-  fetchApplicationsSuccess,
-  fetchApplicationsFailure,
-  clearUserError,
-} = userSlice.actions;
-
-export default userSlice.reducer; 
+export const { clearUserError, clearUserSuccess } = userSlice.actions;
+export default userSlice.reducer;

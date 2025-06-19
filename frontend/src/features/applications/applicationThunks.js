@@ -1,135 +1,66 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { applicationAPI } from '../../api/applicationAPI';
+// features/application/applicationThunks.js
+import { jobApplicationAPI } from '../../api/jobApplicationAPI';
 import {
-  fetchApplicationsStart,
-  fetchApplicationsSuccess,
-  fetchApplicationsFailure,
-  fetchApplicationStart,
-  fetchApplicationSuccess,
-  fetchApplicationFailure,
-  createApplicationStart,
-  createApplicationSuccess,
-  createApplicationFailure,
-  updateApplicationStatusStart,
-  updateApplicationStatusSuccess,
-  updateApplicationStatusFailure,
-  deleteApplicationStart,
-  deleteApplicationSuccess,
-  deleteApplicationFailure,
+  applicationRequestStart,
+  applicationRequestFailure,
+  setApplications,
+  setCurrentApplication,
+  addApplication,
+  updateApplication,
+  removeApplication,
 } from './applicationSlice';
 
-// Fetch all applications (admin)
-export const fetchApplications = createAsyncThunk(
-  'applications/fetchApplications',
-  async (params, { dispatch }) => {
-    try {
-      dispatch(fetchApplicationsStart());
-      const response = await applicationAPI.getApplications(params);
-      dispatch(fetchApplicationsSuccess(response));
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch applications';
-      dispatch(fetchApplicationsFailure(errorMessage));
-      throw error;
-    }
-  }
-);
-
-// Fetch single application
-export const fetchApplication = createAsyncThunk(
-  'applications/fetchApplication',
-  async (id, { dispatch }) => {
-    try {
-      dispatch(fetchApplicationStart());
-      const response = await applicationAPI.getApplication(id);
-      dispatch(fetchApplicationSuccess(response));
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch application';
-      dispatch(fetchApplicationFailure(errorMessage));
-      throw error;
-    }
-  }
-);
-
 // Create new application
-export const createApplication = createAsyncThunk(
-  'applications/createApplication',
-  async (applicationData, { dispatch }) => {
-    try {
-      dispatch(createApplicationStart());
-      const response = await applicationAPI.createApplication(applicationData);
-      dispatch(createApplicationSuccess(response));
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to create application';
-      dispatch(createApplicationFailure(errorMessage));
-      throw error;
-    }
+export const createJobApplication = (applicationData) => async (dispatch) => {
+  try {
+    dispatch(applicationRequestStart());
+    const data = await jobApplicationAPI.createApplication(applicationData);
+    dispatch(addApplication(data.data));
+  } catch (error) {
+    dispatch(applicationRequestFailure(error.message));
   }
-);
+};
+
+// Get all applications for logged-in user
+export const fetchAllApplications = () => async (dispatch) => {
+  try {
+    dispatch(applicationRequestStart());
+    const data = await jobApplicationAPI.getAllApplications();
+    dispatch(setApplications(data.data));
+  } catch (error) {
+    dispatch(applicationRequestFailure(error.message));
+  }
+};
+
+// Get application by ID
+export const fetchApplicationById = (id) => async (dispatch) => {
+  try {
+    dispatch(applicationRequestStart());
+    const data = await jobApplicationAPI.getApplicationById(id);
+    dispatch(setCurrentApplication(data.data));
+  } catch (error) {
+    dispatch(applicationRequestFailure(error.message));
+  }
+};
 
 // Update application status
-export const updateApplicationStatus = createAsyncThunk(
-  'applications/updateStatus',
-  async ({ id, status }, { dispatch }) => {
-    try {
-      dispatch(updateApplicationStatusStart());
-      await applicationAPI.updateApplicationStatus(id, status);
-      dispatch(updateApplicationStatusSuccess({ id, status }));
-      return { id, status };
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to update application status';
-      dispatch(updateApplicationStatusFailure(errorMessage));
-      throw error;
-    }
+export const updateJobApplicationStatus = (id, updateData) => async (dispatch) => {
+  try {
+    dispatch(applicationRequestStart());
+    const data = await jobApplicationAPI.updateApplicationStatus(id, updateData);
+    dispatch(updateApplication(data.data));
+  } catch (error) {
+    dispatch(applicationRequestFailure(error.message));
   }
-);
+};
 
 // Delete application
-export const deleteApplication = createAsyncThunk(
-  'applications/deleteApplication',
-  async (id, { dispatch }) => {
-    try {
-      dispatch(deleteApplicationStart());
-      await applicationAPI.deleteApplication(id);
-      dispatch(deleteApplicationSuccess(id));
-      return id;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to delete application';
-      dispatch(deleteApplicationFailure(errorMessage));
-      throw error;
-    }
+export const deleteJobApplication = (id) => async (dispatch) => {
+  try {
+    dispatch(applicationRequestStart());
+    await jobApplicationAPI.deleteApplication(id);
+    dispatch(removeApplication(id));
+  } catch (error) {
+    dispatch(applicationRequestFailure(error.message));
   }
-);
-
-// Get applications for a specific job
-export const fetchJobApplications = createAsyncThunk(
-  'applications/fetchJobApplications',
-  async (jobId, { dispatch }) => {
-    try {
-      dispatch(fetchApplicationsStart());
-      const response = await applicationAPI.getJobApplications(jobId);
-      dispatch(fetchApplicationsSuccess(response));
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch job applications';
-      dispatch(fetchApplicationsFailure(errorMessage));
-      throw error;
-    }
-  }
-);
-
-// Upload resume
-export const uploadResume = createAsyncThunk(
-  'applications/uploadResume',
-  async (formData) => {
-    try {
-      const response = await applicationAPI.uploadResume(formData);
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to upload resume';
-      throw new Error(errorMessage);
-    }
-  }
-); 
+};

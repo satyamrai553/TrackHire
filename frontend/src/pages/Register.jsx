@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify'; // For showing notifications
 import 'react-toastify/dist/ReactToastify.css';
+import { userAPI } from '../api/userAPI';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -80,17 +81,13 @@ const Register = () => {
         role: 'user'
       });
 
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, {
+      const response = await userAPI.register({
         fullname: formData.fullname,
         email: formData.email,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
         role: 'user'
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      })
       
       console.log('Registration response:', response.data);
       

@@ -1,30 +1,16 @@
+// userThunks.js
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { userAPI } from '../../api/userAPI';
-import {
-  fetchProfileStart,
-  fetchProfileSuccess,
-  fetchProfileFailure,
-  updateProfileStart,
-  updateProfileSuccess,
-  updateProfileFailure,
-  fetchApplicationsStart,
-  fetchApplicationsSuccess,
-  fetchApplicationsFailure,
-} from './userSlice';
 
-// Fetch user profile
+// Fetch current user profile
 export const fetchUserProfile = createAsyncThunk(
   'user/fetchProfile',
-  async (_, { dispatch }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      dispatch(fetchProfileStart());
       const response = await userAPI.getProfile();
-      dispatch(fetchProfileSuccess(response));
-      return response;
+      return response.user || response;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch profile';
-      dispatch(fetchProfileFailure(errorMessage));
-      throw error;
+      return rejectWithValue(error?.response?.data?.message || 'Failed to fetch profile');
     }
   }
 );
@@ -32,63 +18,38 @@ export const fetchUserProfile = createAsyncThunk(
 // Update user profile
 export const updateUserProfile = createAsyncThunk(
   'user/updateProfile',
-  async (userData, { dispatch }) => {
+  async (userData, { rejectWithValue }) => {
     try {
-      dispatch(updateProfileStart());
       const response = await userAPI.updateProfile(userData);
-      dispatch(updateProfileSuccess(response));
-      return response;
+      return response.user || response;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to update profile';
-      dispatch(updateProfileFailure(errorMessage));
-      throw error;
+      return rejectWithValue(error?.response?.data?.message || 'Profile update failed');
     }
   }
 );
 
-// Change password
-export const changePassword = createAsyncThunk(
+// Change user password
+export const changeUserPassword = createAsyncThunk(
   'user/changePassword',
-  async (passwordData, { dispatch }) => {
+  async (passwordData, { rejectWithValue }) => {
     try {
       const response = await userAPI.changePassword(passwordData);
-      return response;
+      return response.message || response;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to change password';
-      throw new Error(errorMessage);
+      return rejectWithValue(error?.response?.data?.message || 'Password change failed');
     }
   }
 );
 
 // Upload avatar
-export const uploadAvatar = createAsyncThunk(
+export const uploadUserAvatar = createAsyncThunk(
   'user/uploadAvatar',
-  async (formData, { dispatch }) => {
+  async (formData, { rejectWithValue }) => {
     try {
       const response = await userAPI.uploadAvatar(formData);
-      // Refresh profile after avatar upload
-      dispatch(fetchUserProfile());
-      return response;
+      return response.user || response;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to upload avatar';
-      throw new Error(errorMessage);
+      return rejectWithValue(error?.response?.data?.message || 'Avatar upload failed');
     }
   }
 );
-
-// Fetch user applications
-export const fetchUserApplications = createAsyncThunk(
-  'user/fetchApplications',
-  async (_, { dispatch }) => {
-    try {
-      dispatch(fetchApplicationsStart());
-      const response = await userAPI.getApplications();
-      dispatch(fetchApplicationsSuccess(response));
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch applications';
-      dispatch(fetchApplicationsFailure(errorMessage));
-      throw error;
-    }
-  }
-); 
